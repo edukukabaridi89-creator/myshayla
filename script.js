@@ -50,6 +50,10 @@ const questions = [
     hint: "Love also lives in ordinary days."
   },
   {
+    text: "I will respect my partner's boundaries around physical affection and intimacy, and we will only share intimate moments when we both freely want to and feel comfortable.",
+    hint: "No pressure, no guilt, and no assumptions — consent and comfort come first."
+  },
+  {
     text: "When one of us needs space to cool down, I will respect that space and come back to the conversation instead of disappearing indefinitely.",
     hint: "A pause is different from punishment or silent treatment."
   },
@@ -92,15 +96,20 @@ function spawnHeart(){
   $("hearts").appendChild(h);
   setTimeout(()=>h.remove(),10000);
 }
+
 setInterval(spawnHeart, 900);
 
 function typeMessage(){
   clearInterval(typingTimer);
+
   const el = $("typedMessage");
   el.textContent = "";
+
   let i = 0;
+
   typingTimer = setInterval(()=>{
     el.textContent = message.slice(0, i++);
+
     if(i > message.length){
       clearInterval(typingTimer);
       $("message").querySelector(".next-btn").classList.remove("hidden");
@@ -121,40 +130,78 @@ document.querySelectorAll("[data-next]").forEach(btn=>{
 
 function renderPhoto(){
   $("galleryImage").src = `/images/${String(currentPhoto+1).padStart(2,"0")}-${[
-    "introduction","bible","partnership","money","home-car","both-keys","future","wedding"
+    "introduction",
+    "bible",
+    "partnership",
+    "money",
+    "home-car",
+    "both-keys",
+    "future",
+    "wedding"
   ][currentPhoto]}.jpg`;
+
   $("galleryImage").onerror = () => {
     $("galleryImage").src = `/images/${String(currentPhoto+1).padStart(2,"0")}-${[
-      "introduction","bible","partnership","money","home-car","both-keys","future","wedding"
+      "introduction",
+      "bible",
+      "partnership",
+      "money",
+      "home-car",
+      "both-keys",
+      "future",
+      "wedding"
     ][currentPhoto]}.png`;
   };
+
   $("galleryCaption").textContent = captions[currentPhoto];
   $("photoNumber").textContent = currentPhoto+1;
+
   $("prevPhoto").disabled = currentPhoto === 0;
   $("prevPhoto").style.opacity = currentPhoto === 0 ? .35 : 1;
 }
+
 $("nextPhoto").addEventListener("click", ()=>{
-  if(currentPhoto < 7){ currentPhoto++; renderPhoto(); }
-  else show("hard-easy");
+  if(currentPhoto < 7){
+    currentPhoto++;
+    renderPhoto();
+  } else {
+    show("hard-easy");
+  }
 });
+
 $("prevPhoto").addEventListener("click", ()=>{
-  if(currentPhoto > 0){ currentPhoto--; renderPhoto(); }
+  if(currentPhoto > 0){
+    currentPhoto--;
+    renderPhoto();
+  }
 });
+
 renderPhoto();
 
 function renderQuestion(){
   const q = questions[currentQuestion];
+
   $("questionText").textContent = q.text;
   $("questionHint").textContent = q.hint;
-  $("promiseNumber").textContent = String(currentQuestion+1).padStart(2,"0");
-  $("questionLabel").textContent = `Promise ${currentQuestion+1} of ${questions.length}`;
-  const pct = Math.round(((currentQuestion+1)/questions.length)*100);
+
+  $("promiseNumber").textContent =
+    String(currentQuestion+1).padStart(2,"0");
+
+  $("questionLabel").textContent =
+    `Promise ${currentQuestion+1} of ${questions.length}`;
+
+  const pct = Math.round(
+    ((currentQuestion+1) / questions.length) * 100
+  );
+
   $("progressPercent").textContent = `${pct}%`;
   $("progressBar").style.width = `${pct}%`;
 }
+
 document.querySelectorAll(".answer").forEach(btn=>{
   btn.addEventListener("click", ()=>{
     state.answers[currentQuestion] = btn.dataset.answer;
+
     if(currentQuestion < questions.length-1){
       currentQuestion++;
       renderQuestion();
@@ -164,22 +211,41 @@ document.querySelectorAll(".answer").forEach(btn=>{
     }
   });
 });
+
 renderQuestion();
 
 function renderSummary(){
   $("answerSummary").innerHTML = questions.map((q,i)=>`
     <div class="summary-item">
       <strong>${escapeHtml(q.text)}</strong>
-      <span>${state.answers[i] === "YES" ? "YES — AGREED ❤️" : "NO — NOT YET"}</span>
+      <span>
+        ${
+          state.answers[i] === "YES"
+            ? "YES — AGREED ❤️"
+            : "NO — NOT YET"
+        }
+      </span>
     </div>
   `).join("");
 }
 
-$("goSign").addEventListener("click", ()=>show("signature"));
+$("goSign").addEventListener("click", ()=>{
+  show("signature");
+});
 
 function escapeHtml(s){
-  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  return s.replace(
+    /[&<>"']/g,
+    c => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#039;'
+    }[c])
+  );
 }
+
 
 /* =========================
    SIGNATURE PAD
@@ -195,10 +261,24 @@ function setupCanvas() {
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
 
-  canvas.width = Math.max(1, Math.round(rect.width * dpr));
-  canvas.height = Math.max(1, Math.round(rect.height * dpr));
+  canvas.width = Math.max(
+    1,
+    Math.round(rect.width * dpr)
+  );
 
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  canvas.height = Math.max(
+    1,
+    Math.round(rect.height * dpr)
+  );
+
+  ctx.setTransform(
+    dpr,
+    0,
+    0,
+    dpr,
+    0,
+    0
+  );
 
   ctx.lineWidth = 3;
   ctx.lineCap = "round";
@@ -207,6 +287,7 @@ function setupCanvas() {
 }
 
 setupCanvas();
+
 window.addEventListener("resize", setupCanvas);
 
 function getPointerPosition(event) {
@@ -233,7 +314,7 @@ canvas.addEventListener("pointerdown", (event) => {
 });
 
 canvas.addEventListener("pointermove", (event) => {
-  if (!drawing) return;
+  if(!drawing) return;
 
   event.preventDefault();
 
@@ -244,15 +325,15 @@ canvas.addEventListener("pointermove", (event) => {
 });
 
 function stopDrawing(event) {
-  if (!drawing) return;
+  if(!drawing) return;
 
   drawing = false;
 
   try {
-    if (canvas.hasPointerCapture(event.pointerId)) {
+    if(canvas.hasPointerCapture(event.pointerId)){
       canvas.releasePointerCapture(event.pointerId);
     }
-  } catch (error) {}
+  } catch(error) {}
 
   ctx.closePath();
 }
@@ -263,22 +344,30 @@ canvas.addEventListener("pointercancel", stopDrawing);
 $("clearSignature").addEventListener("click", () => {
   const rect = canvas.getBoundingClientRect();
 
-  ctx.clearRect(0, 0, rect.width, rect.height);
+  ctx.clearRect(
+    0,
+    0,
+    rect.width,
+    rect.height
+  );
 
   hasSignature = false;
   state.signature = "";
 });
 
 $("finish").addEventListener("click", async () => {
-  if (!hasSignature) {
+
+  if(!hasSignature){
     alert("Shylaaa, you need to sign first ❤️");
     return;
   }
 
   state.signature = canvas.toDataURL("image/png");
+
   $("savedSignature").src = state.signature;
 
   renderFinalLetter();
+
   show("finale");
 
   setTimeout(() => {
@@ -288,50 +377,107 @@ $("finish").addEventListener("click", async () => {
   await sendToTelegram();
 });
 
+
+/* =========================
+   FINAL LETTER
+========================= */
+
 function renderFinalLetter() {
+
   const accepted = questions.map((q, i) => `
     <p>
-      <strong>${i + 1}. ${escapeHtml(q.text)}</strong><br>
-      <span style="color:${state.answers[i] === "YES" ? "#ff9fba" : "#b7aab4"}">
-        ${state.answers[i] === "YES" ? "YES — accepted ❤️" : "NO — not yet"}
+      <strong>
+        ${i + 1}. ${escapeHtml(q.text)}
+      </strong>
+      <br>
+
+      <span style="color:${
+        state.answers[i] === "YES"
+          ? "#ff9fba"
+          : "#b7aab4"
+      }">
+
+        ${
+          state.answers[i] === "YES"
+            ? "YES — accepted ❤️"
+            : "NO — not yet"
+        }
+
       </span>
     </p>
   `).join("");
 
   $("finalLetter").innerHTML = `
     <p><strong>My Shylaaa,</strong></p>
-    <p>We found each other. Now we get to choose how we treat what we found.</p>
-    <p>Whatever life brings, I hope we keep choosing respect over pride, conversation over assumptions, teamwork over competition, and patience over words we cannot take back.</p>
+
+    <p>
+      We found each other.
+      Now we get to choose how we treat what we found.
+    </p>
+
+    <p>
+      Whatever life brings, I hope we keep choosing
+      respect over pride, conversation over assumptions,
+      teamwork over competition, and patience over words
+      we cannot take back.
+    </p>
+
     <p><strong>Our commitments:</strong></p>
+
     ${accepted}
-    <p>These aren't chains or rules. They're promises we can keep revisiting, talking about, and improving together.</p>
-    <p>Here's to the ordinary days, the big dreams, the hard conversations, the laughter, the prayers, the adventures, and every chapter still ahead.</p>
+
+    <p>
+      These aren't chains or rules.
+      They're promises we can keep revisiting,
+      talking about, and improving together.
+    </p>
+
+    <p>
+      Here's to the ordinary days, the big dreams,
+      the hard conversations, the laughter, the prayers,
+      the adventures, and every chapter still ahead.
+    </p>
   `;
 }
 
+
+/* =========================
+   TELEGRAM SUBMISSION
+========================= */
+
 async function sendToTelegram() {
+
   try {
+
     const payload = {
       timestamp: new Date().toISOString(),
+
       answers: questions.map((q, i) => ({
         question: q.text,
         answer: state.answers[i]
       })),
+
       signature: state.signature
     };
 
     const response = await fetch("/api/submit", {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json"
       },
+
       body: JSON.stringify(payload)
     });
 
-    if (!response.ok) {
+    if(!response.ok){
       console.warn("Telegram submission failed.");
     }
-  } catch (err) {
-    console.warn("Telegram submission error:", err);
+
+  } catch(err) {
+    console.warn(
+      "Telegram submission error:",
+      err
+    );
   }
 }
