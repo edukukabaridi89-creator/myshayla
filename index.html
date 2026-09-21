@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#09070b" />
+  <title>For My Shylaaa ❤️</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="grain"></div>
+  <div id="hearts"></div>
+
+  <main id="app">
+    <section class="screen active" id="welcome">
+      <div class="orb orb-1"></div><div class="orb orb-2"></div>
+      <div class="eyebrow">A little something for you</div>
+      <h1>Hey, my <span>Shylaaa</span>…</h1>
+      <p class="lead">Are you ready?</p>
+      <div class="choice-row">
+        <button class="choice primary" data-action="start">Yes, I'm ready ❤️</button>
+        <button class="choice ghost" data-action="start">Of course 🥹</button>
+      </div>
+      <p class="tiny">Take your time. There is no rush.</p>
+    </section>
+
+    <section class="screen" id="message">
+      <div class="card letter-card">
+        <div class="eyebrow">For the girl I call Shylaaa</div>
+        <div id="typedMessage" class="typed"></div>
+        <button class="next-btn hidden" data-next="gallery">Continue <span>→</span></button>
+      </div>
+    </section>
+
+    <section class="screen" id="gallery">
+      <div class="section-head">
+        <div class="eyebrow">The kind of life I want to build</div>
+        <h2>These are the moments I want to share with you.</h2>
+        <p>One picture at a time. One chapter at a time.</p>
+      </div>
+      <div class="photo-stage">
+        <img id="galleryImage" src="/images/01-introduction.jpg" alt="A memory together" />
+        <div class="photo-caption" id="galleryCaption"></div>
+        <div class="photo-count"><span id="photoNumber">1</span> / 8</div>
+      </div>
+      <div class="gallery-controls">
+        <button class="icon-btn" id="prevPhoto" aria-label="Previous photo">←</button>
+        <button class="next-btn" id="nextPhoto">Next <span>→</span></button>
+      </div>
+    </section>
+
+    <section class="screen" id="hard-easy">
+      <div class="card centered">
+        <div class="eyebrow">One thing I want you to remember</div>
+        <h2>We already did the hard thing.</h2>
+        <div class="big-line">We found each other.</div>
+        <p class="large-copy">
+          Now let's do the easy thing — <strong>choosing each other, taking care of what we have,
+          and staying together through the beautiful days and the difficult ones.</strong>
+        </p>
+        <p class="soft-copy">
+          We won't always agree. We won't always understand each other immediately.
+          But when things get heavy, I want us to remember that we're on the same side.
+        </p>
+        <button class="next-btn" data-next="questions">Let's make our promises <span>→</span></button>
+      </div>
+    </section>
+
+    <section class="screen" id="questions">
+      <div class="section-head">
+        <div class="eyebrow">Our little agreement</div>
+        <h2>Shylaaa, let's make this intentional.</h2>
+        <p>Answer honestly. These are meant to be mutual commitments, not rules to control each other.</p>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-top"><span id="questionLabel">Promise 1 of 10</span><span id="progressPercent">10%</span></div>
+        <div class="progress"><div id="progressBar"></div></div>
+      </div>
+
+      <div class="promise-card">
+        <div class="promise-number" id="promiseNumber">01</div>
+        <h3 id="questionText"></h3>
+        <p id="questionHint"></p>
+        <div class="yes-no">
+          <button class="answer" data-answer="YES">YES — I AGREE ❤️</button>
+          <button class="answer no" data-answer="NO">NO — NOT YET</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="final-check">
+      <div class="card centered">
+        <div class="eyebrow">Almost there</div>
+        <h2>One last thing.</h2>
+        <p class="large-copy">Read everything below. Your answers will be shown in your keepsake letter.</p>
+        <div id="answerSummary" class="answer-summary"></div>
+        <button class="next-btn" id="goSign">I understand <span>→</span></button>
+      </div>
+    </section>
+
+    <section class="screen" id="signature">
+      <div class="card centered signature-card">
+        <div class="eyebrow">Make it official</div>
+        <h2>Write your name, Shylaaa.</h2>
+        <p>Use your finger or mouse to sign below.</p>
+        <canvas id="signatureCanvas" width="900" height="300"></canvas>
+        <div class="signature-tools">
+          <button class="ghost-btn" id="clearSignature">Clear</button>
+          <button class="next-btn" id="finish">Sign & seal it ❤️</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="finale">
+      <div class="finale-wrap">
+        <div class="handwritten" id="handwritten">For my Shylaaa, always.</div>
+        <div class="seal">♥</div>
+        <h1>You are now officially<br><span>taken, girrrlll.</span></h1>
+        <p class="final-copy">
+          Not because a website said so — but because two people chose to keep building,
+          learning, laughing, forgiving, and growing together.
+        </p>
+        <div class="final-letter" id="finalLetter"></div>
+        <div class="signed-line">
+          <span>Signed by Shylaaa</span>
+          <img id="savedSignature" alt="Signature" />
+        </div>
+        <p class="tiny">Made with intention. Kept with love.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/script.js"></script>
+</body>
+</html>
