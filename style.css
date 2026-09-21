@@ -284,6 +284,10 @@ h2 span{
   flex-direction:column;
 }
 
+/* =========================================
+   PHOTO GALLERY
+   ========================================= */
+
 .photo-stage{
   width:min(760px,100%);
   position:relative;
@@ -294,11 +298,25 @@ h2 span{
   box-shadow:var(--shadow);
 }
 
+/*
+  Show the COMPLETE photo.
+
+  Previously:
+  object-fit: cover;
+  height: 65vh;
+
+  That caused portrait/wide images to be cropped.
+
+  Now the image keeps its natural aspect ratio
+  and fits completely inside the gallery.
+*/
 .photo-stage img{
   width:100%;
-  height:min(65vh,620px);
-  object-fit:cover;
+  height:auto;
+  max-height:620px;
+  object-fit:contain;
   display:block;
+  background:#000;
 }
 
 .photo-caption{
@@ -467,7 +485,7 @@ h2 span{
 
 /* =========================================
    SIGNATURE SECTION
-========================================= */
+   ========================================= */
 
 .signature-card{
   max-width:900px;
@@ -475,6 +493,7 @@ h2 span{
 
 
 /* The actual signature writing area */
+
 #signatureCanvas{
   display:block;
   width:100%;
@@ -508,6 +527,7 @@ h2 span{
 
 
 /* Small visual feedback when hovering over the signature area */
+
 #signatureCanvas:hover{
   border-color:rgba(255,93,143,.65);
   box-shadow:
@@ -517,6 +537,7 @@ h2 span{
 
 
 /* Signature buttons */
+
 .signature-tools{
   display:flex;
   justify-content:center;
@@ -526,6 +547,7 @@ h2 span{
 
 
 /* Clear-signature button */
+
 #clearSignature{
   transition:.25s ease;
 }
@@ -538,6 +560,7 @@ h2 span{
 
 
 /* Finish/sign button */
+
 #finish{
   transition:.25s ease;
 }
@@ -551,7 +574,7 @@ h2 span{
 
 /* =========================================
    FINAL SCREEN
-========================================= */
+   ========================================= */
 
 #finale{
   text-align:center;
@@ -646,7 +669,7 @@ h2 span{
 
 /* =========================================
    MOBILE
-========================================= */
+   ========================================= */
 
 @media(max-width:600px){
 
@@ -663,8 +686,16 @@ h2 span{
     grid-template-columns:1fr;
   }
 
+  /*
+    Mobile gallery:
+    keep the entire image visible instead of
+    forcing it into a fixed-height cropped frame.
+  */
   .photo-stage img{
-    height:58vh;
+    width:100%;
+    height:auto;
+    max-height:none;
+    object-fit:contain;
   }
 
   .typed{
@@ -675,6 +706,7 @@ h2 span{
     Keep the signature area large enough to actually
     write on even on a phone.
   */
+
   #signatureCanvas{
     height:260px;
     min-height:260px;
