@@ -17,15 +17,21 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Telegram environment variables are not configured." });
     }
 
-    const lines = [
-      "❤️ SHYLAAA LOVE SITE — NEW COMPLETION",
-      "",
-      `Time: ${timestamp || new Date().toISOString()}`,
-      "",
-      ...answers.map((item, i) =>
-        `${i + 1}. ${item.answer === "YES" ? "✅ YES" : "❌ NO"}\n${item.question}`
-      )
-    ];
+    const eatTime = new Date(timestamp || Date.now()).toLocaleString("en-KE", {
+  timeZone: "Africa/Nairobi",
+  dateStyle: "medium",
+  timeStyle: "medium"
+});
+
+const lines = [
+  "❤️ SHYLAAA LOVE SITE — NEW COMPLETION",
+  "",
+  `Time: ${eatTime} EAT`,
+  "",
+  ...answers.map((item, i) =>
+    `${i + 1}. ${item.answer === "YES" ? "✅ YES" : "❌ NO"}\n${item.question}`
+  )
+];
 
     const text = lines.join("\n\n");
 
