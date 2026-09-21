@@ -181,61 +181,121 @@ function escapeHtml(s){
   return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 }
 
-/* Signature pad */
+/* =========================
+   SIGNATURE PAD
+========================= */
+
 const canvas = $("signatureCanvas");
 const ctx = canvas.getContext("2d");
-let drawing = false;
 
-function resizeCanvas(){
-  const ratio = window.devicePixelRatio || 1;
+let drawing = false;
+let hasSignature = false;
+
+function setupCanvas() {
   const rect = canvas.getBoundingClientRect();
-  const old = canvas.toDataURL();
-  canvas.width = rect.width * ratio;
-  canvas.height = rect.height * ratio;
-  ctx.scale(ratio, ratio);
+  const dpr = window.devicePixelRatio || 1;
+
+  canvas.width = Math.max(1, Math.round(rect.width * dpr));
+  canvas.height = Math.max(1, Math.round(rect.height * dpr));
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
   ctx.lineWidth = 3;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
   ctx.strokeStyle = "#1b0d14";
-  if(state.signature){
-    const img = new Image();
-    img.onload = ()=>ctx.drawImage(img,0,0,rect.width,rect.height);
-    img.src = state.signature;
-  }
 }
-function pos(e){
-  const r = canvas.getBoundingClientRect();
-  const point = e.touches ? e.touches[0] : e;
-  return {x:point.clientX-r.left,y:point.clientY-r.top};
-}
-function startDraw(e){drawing=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();}
-function draw(e){if(!drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();e.preventDefault();}
-function endDraw(){drawing=false;}
-canvas.addEventListener("mousedown",startDraw); canvas.addEventListener("mousemove",draw); window.addEventListener("mouseup",endDraw);
-canvas.addEventListener("touchstart",startDraw,{passive:false}); canvas.addEventListener("touchmove",draw,{passive:false}); window.addEventListener("touchend",endDraw);
-window.addEventListener("resize",resizeCanvas);
-resizeCanvas();
 
-$("clearSignature").addEventListener("click",()=>{
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  state.signature="";
+setupCanvas();
+window.addEventListener("resize", setupCanvas);
+
+function getPointerPosition(event) {
+  const rect = canvas.getBoundingClientRect();
+
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top
+  };
+}
+
+canvas.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+
+  drawing = true;
+  hasSignature = true;
+
+  canvas.setPointerCapture(event.pointerId);
+
+  const point = getPointerPosition(event);
+
+  ctx.beginPath();
+  ctx.moveTo(point.x, point.y);
 });
 
-$("finish").addEventListener("click", async ()=>{
+canvas.addEventListener("pointermove", (event) => {
+  if (!drawing) return;
+
+  event.preventDefault();
+
+  const point = getPointerPosition(event);
+
+  ctx.lineTo(point.x, point.y);
+  ctx.stroke();
+});
+
+function stopDrawing(event) {
+  if (!drawing) return;
+
+  drawing = false;
+
+  try {
+    if (canvas.hasPointerCapture(event.pointerId)) {
+      canvas.releasePointerCapture(event.pointerId);
+    }
+  } catch (error) {}
+
+  ctx.closePath();
+}
+
+canvas.addEventListener("pointerup", stopDrawing);
+canvas.addEventListener("pointercancel", stopDrawing);
+
+$("clearSignature").addEventListener("click", () => {
+  const rect = canvas.getBoundingClientRect();
+
+  ctx.clearRect(0, 0, rect.width, rect.height);
+
+  hasSignature = false;
+  state.signature = "";
+});
+
+$("finish").addEventListener("click", async () => {
+  if (!hasSignature) {
+    alert("Shylaaa, you need to sign first ❤️");
+    return;
+  }
+
   state.signature = canvas.toDataURL("image/png");
   $("savedSignature").src = state.signature;
+
   renderFinalLetter();
   show("finale");
-  setTimeout(()=>$("handwritten").classList.add("show"),150);
+
+  setTimeout(() => {
+    $("handwritten").classList.add("show");
+  }, 150);
+
   await sendToTelegram();
 });
 
-function renderFinalLetter(){
-  const accepted = questions.map((q,i)=>`
-    <p><strong>${i+1}. ${escapeHtml(q.text)}</strong><br>
-    <span style="color:${state.answers[i]==="YES" ? "#ff9fba" : "#b7aab4"}">
-      ${state.answers[i] === "YES" ? "YES — accepted ❤️" : "NO — not yet"}
-    </span></p>
+function renderFinalLetter() {
+  const accepted = questions.map((q, i) => `
+    <p>
+      <strong>${i + 1}. ${escapeHtml(q.text)}</strong><br>
+      <span style="color:${state.answers[i] === "YES" ? "#ff9fba" : "#b7aab4"}">
+        ${state.answers[i] === "YES" ? "YES — accepted ❤️" : "NO — not yet"}
+      </span>
+    </p>
   `).join("");
 
   $("finalLetter").innerHTML = `
@@ -249,20 +309,29 @@ function renderFinalLetter(){
   `;
 }
 
-async function sendToTelegram(){
-  try{
+async function sendToTelegram() {
+  try {
     const payload = {
       timestamp: new Date().toISOString(),
-      answers: questions.map((q,i)=>({question:q.text, answer:state.answers[i]})),
+      answers: questions.map((q, i) => ({
+        question: q.text,
+        answer: state.answers[i]
+      })),
       signature: state.signature
     };
-    const response = await fetch("/api/submit",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(payload)
+
+    const response = await fetch("/api/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
     });
-    if(!response.ok) console.warn("Telegram submission failed.");
-  }catch(err){
-    console.warn("Telegram submission error:",err);
+
+    if (!response.ok) {
+      console.warn("Telegram submission failed.");
+    }
+  } catch (err) {
+    console.warn("Telegram submission error:", err);
   }
 }
