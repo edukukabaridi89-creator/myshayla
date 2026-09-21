@@ -83,53 +83,95 @@ const screens = [...document.querySelectorAll(".screen")];
 
 function show(id){
   screens.forEach(s => s.classList.toggle("active", s.id === id));
-  window.scrollTo({top:0, behavior:"smooth"});
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
+
+
+/* =========================
+   FLOATING HEARTS
+========================= */
 
 function spawnHeart(){
   const h = document.createElement("div");
+
   h.className = "heart";
   h.textContent = Math.random() > .25 ? "♥" : "✦";
-  h.style.left = `${Math.random()*100}%`;
-  h.style.fontSize = `${12 + Math.random()*20}px`;
-  h.style.animationDuration = `${5 + Math.random()*5}s`;
+  h.style.left = `${Math.random() * 100}%`;
+  h.style.fontSize = `${12 + Math.random() * 20}px`;
+  h.style.animationDuration = `${5 + Math.random() * 5}s`;
+
   $("hearts").appendChild(h);
-  setTimeout(()=>h.remove(),10000);
+
+  setTimeout(() => h.remove(), 10000);
 }
 
 setInterval(spawnHeart, 900);
 
+
+/* =========================
+   TYPING MESSAGE
+========================= */
+
 function typeMessage(){
+
   clearInterval(typingTimer);
 
   const el = $("typedMessage");
+
   el.textContent = "";
 
   let i = 0;
 
-  typingTimer = setInterval(()=>{
+  typingTimer = setInterval(() => {
+
     el.textContent = message.slice(0, i++);
 
     if(i > message.length){
+
       clearInterval(typingTimer);
-      $("message").querySelector(".next-btn").classList.remove("hidden");
+
+      $("message")
+        .querySelector(".next-btn")
+        .classList.remove("hidden");
     }
+
   }, 18);
 }
 
-document.querySelectorAll("[data-action='start']").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    show("message");
-    typeMessage();
-  });
-});
 
-document.querySelectorAll("[data-next]").forEach(btn=>{
-  btn.addEventListener("click", ()=>show(btn.dataset.next));
-});
+document
+  .querySelectorAll("[data-action='start']")
+  .forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+      show("message");
+
+      typeMessage();
+    });
+  });
+
+
+document
+  .querySelectorAll("[data-next]")
+  .forEach(btn => {
+
+    btn.addEventListener("click", () => {
+      show(btn.dataset.next);
+    });
+  });
+
+
+/* =========================
+   GALLERY
+========================= */
 
 function renderPhoto(){
-  $("galleryImage").src = `/images/${String(currentPhoto+1).padStart(2,"0")}-${[
+
+  const names = [
     "introduction",
     "bible",
     "partnership",
@@ -138,277 +180,578 @@ function renderPhoto(){
     "both-keys",
     "future",
     "wedding"
-  ][currentPhoto]}.jpg`;
+  ];
+
+  const filename =
+    `${String(currentPhoto + 1).padStart(2, "0")}-${names[currentPhoto]}`;
+
+  $("galleryImage").src =
+    `/images/${filename}.jpg`;
 
   $("galleryImage").onerror = () => {
-    $("galleryImage").src = `/images/${String(currentPhoto+1).padStart(2,"0")}-${[
-      "introduction",
-      "bible",
-      "partnership",
-      "money",
-      "home-car",
-      "both-keys",
-      "future",
-      "wedding"
-    ][currentPhoto]}.png`;
+
+    $("galleryImage").src =
+      `/images/${filename}.png`;
   };
 
-  $("galleryCaption").textContent = captions[currentPhoto];
-  $("photoNumber").textContent = currentPhoto+1;
+  $("galleryCaption").textContent =
+    captions[currentPhoto];
 
-  $("prevPhoto").disabled = currentPhoto === 0;
-  $("prevPhoto").style.opacity = currentPhoto === 0 ? .35 : 1;
+  $("photoNumber").textContent =
+    currentPhoto + 1;
+
+  $("prevPhoto").disabled =
+    currentPhoto === 0;
+
+  $("prevPhoto").style.opacity =
+    currentPhoto === 0 ? .35 : 1;
 }
 
-$("nextPhoto").addEventListener("click", ()=>{
+
+$("nextPhoto").addEventListener("click", () => {
+
   if(currentPhoto < 7){
+
     currentPhoto++;
+
     renderPhoto();
+
   } else {
+
     show("hard-easy");
   }
 });
 
-$("prevPhoto").addEventListener("click", ()=>{
+
+$("prevPhoto").addEventListener("click", () => {
+
   if(currentPhoto > 0){
+
     currentPhoto--;
+
     renderPhoto();
   }
 });
 
+
 renderPhoto();
 
+
+/* =========================
+   QUESTIONS / PROMISES
+========================= */
+
 function renderQuestion(){
+
   const q = questions[currentQuestion];
 
-  $("questionText").textContent = q.text;
-  $("questionHint").textContent = q.hint;
+  $("questionText").textContent =
+    q.text;
+
+  $("questionHint").textContent =
+    q.hint;
 
   $("promiseNumber").textContent =
-    String(currentQuestion+1).padStart(2,"0");
+    String(currentQuestion + 1).padStart(2, "0");
 
   $("questionLabel").textContent =
-    `Promise ${currentQuestion+1} of ${questions.length}`;
+    `Promise ${currentQuestion + 1} of ${questions.length}`;
 
   const pct = Math.round(
-    ((currentQuestion+1) / questions.length) * 100
+    ((currentQuestion + 1) / questions.length) * 100
   );
 
-  $("progressPercent").textContent = `${pct}%`;
-  $("progressBar").style.width = `${pct}%`;
+  $("progressPercent").textContent =
+    `${pct}%`;
+
+  $("progressBar").style.width =
+    `${pct}%`;
 }
 
-document.querySelectorAll(".answer").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    state.answers[currentQuestion] = btn.dataset.answer;
 
-    if(currentQuestion < questions.length-1){
-      currentQuestion++;
-      renderQuestion();
-    } else {
-      renderSummary();
-      show("final-check");
-    }
+document
+  .querySelectorAll(".answer")
+  .forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+      state.answers[currentQuestion] =
+        btn.dataset.answer;
+
+      if(currentQuestion < questions.length - 1){
+
+        currentQuestion++;
+
+        renderQuestion();
+
+      } else {
+
+        renderSummary();
+
+        show("final-check");
+      }
+    });
   });
-});
+
 
 renderQuestion();
 
+
 function renderSummary(){
-  $("answerSummary").innerHTML = questions.map((q,i)=>`
-    <div class="summary-item">
-      <strong>${escapeHtml(q.text)}</strong>
-      <span>
-        ${
-          state.answers[i] === "YES"
-            ? "YES — AGREED ❤️"
-            : "NO — NOT YET"
-        }
-      </span>
-    </div>
-  `).join("");
+
+  $("answerSummary").innerHTML =
+    questions.map((q, i) => `
+
+      <div class="summary-item">
+
+        <strong>
+          ${escapeHtml(q.text)}
+        </strong>
+
+        <span>
+
+          ${
+            state.answers[i] === "YES"
+              ? "YES — AGREED ❤️"
+              : "NO — NOT YET"
+          }
+
+        </span>
+
+      </div>
+
+    `).join("");
 }
 
-$("goSign").addEventListener("click", ()=>{
+
+$("goSign").addEventListener("click", () => {
   show("signature");
 });
 
+
 function escapeHtml(s){
+
   return s.replace(
     /[&<>"']/g,
+
     c => ({
-      '&':'&amp;',
-      '<':'&lt;',
-      '>':'&gt;',
-      '"':'&quot;',
-      "'":'&#039;'
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
     }[c])
   );
 }
 
 
-/* =========================
+/* =========================================================
    SIGNATURE PAD
-========================= */
+========================================================= */
 
 const canvas = $("signatureCanvas");
-const ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d", {
+  alpha: true
+});
 
 let drawing = false;
 let hasSignature = false;
 
-function setupCanvas() {
+
+/*
+  Configure the canvas.
+
+  The important part here is that we:
+  1. Get the actual displayed size.
+  2. Resize the internal canvas for sharpness.
+  3. RESET the transform before applying scaling.
+  4. Explicitly set the ink color to dark.
+*/
+
+function setupCanvas(){
+
   const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
 
-  canvas.width = Math.max(
-    1,
-    Math.round(rect.width * dpr)
-  );
+  const width =
+    Math.max(1, Math.round(rect.width));
 
-  canvas.height = Math.max(
-    1,
-    Math.round(rect.height * dpr)
-  );
+  const height =
+    Math.max(1, Math.round(rect.height));
 
-  ctx.setTransform(
-    dpr,
-    0,
-    0,
-    dpr,
-    0,
-    0
-  );
+  const dpr =
+    Math.max(1, window.devicePixelRatio || 1);
+
+
+  /*
+    Set the REAL pixel resolution.
+  */
+
+  canvas.width =
+    width * dpr;
+
+  canvas.height =
+    height * dpr;
+
+
+  /*
+    Reset any previous transformation.
+  */
+
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+
+  /*
+    Scale drawing coordinates back to
+    the normal CSS-pixel coordinate system.
+  */
+
+  ctx.scale(dpr, dpr);
+
+
+  /*
+    SIGNATURE INK
+  */
+
+  ctx.strokeStyle = "#1b0d14";
+  ctx.fillStyle = "#1b0d14";
 
   ctx.lineWidth = 3;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  ctx.strokeStyle = "#1b0d14";
+
+
+  /*
+    Make sure the browser doesn't try to
+    scroll the page while drawing.
+  */
+
+  canvas.style.touchAction = "none";
 }
+
+
+/*
+  Initial setup.
+*/
 
 setupCanvas();
 
-window.addEventListener("resize", setupCanvas);
 
-function getPointerPosition(event) {
-  const rect = canvas.getBoundingClientRect();
+/*
+  Recalculate if the browser/window changes size.
+*/
 
-  return {
-    x: event.clientX - rect.left,
-    y: event.clientY - rect.top
-  };
-}
+window.addEventListener("resize", () => {
 
-canvas.addEventListener("pointerdown", (event) => {
-  event.preventDefault();
+  /*
+    Don't resize unnecessarily while
+    the user isn't using the canvas.
+  */
 
-  drawing = true;
-  hasSignature = true;
-
-  canvas.setPointerCapture(event.pointerId);
-
-  const point = getPointerPosition(event);
-
-  ctx.beginPath();
-  ctx.moveTo(point.x, point.y);
-});
-
-canvas.addEventListener("pointermove", (event) => {
-  if(!drawing) return;
-
-  event.preventDefault();
-
-  const point = getPointerPosition(event);
-
-  ctx.lineTo(point.x, point.y);
-  ctx.stroke();
-});
-
-function stopDrawing(event) {
-  if(!drawing) return;
-
-  drawing = false;
-
-  try {
-    if(canvas.hasPointerCapture(event.pointerId)){
-      canvas.releasePointerCapture(event.pointerId);
-    }
-  } catch(error) {}
-
-  ctx.closePath();
-}
-
-canvas.addEventListener("pointerup", stopDrawing);
-canvas.addEventListener("pointercancel", stopDrawing);
-
-$("clearSignature").addEventListener("click", () => {
-  const rect = canvas.getBoundingClientRect();
-
-  ctx.clearRect(
-    0,
-    0,
-    rect.width,
-    rect.height
-  );
-
-  hasSignature = false;
-  state.signature = "";
-});
-
-$("finish").addEventListener("click", async () => {
-
-  if(!hasSignature){
-    alert("Shylaaa, you need to sign first ❤️");
-    return;
-  }
-
-  state.signature = canvas.toDataURL("image/png");
-
-  $("savedSignature").src = state.signature;
-
-  renderFinalLetter();
-
-  show("finale");
-
-  setTimeout(() => {
-    $("handwritten").classList.add("show");
-  }, 150);
-
-  await sendToTelegram();
+  setupCanvas();
 });
 
 
 /* =========================
-   FINAL LETTER
+   POINTER POSITION
 ========================= */
 
-function renderFinalLetter() {
+function getPointerPosition(event){
 
-  const accepted = questions.map((q, i) => `
-    <p>
-      <strong>
-        ${i + 1}. ${escapeHtml(q.text)}
-      </strong>
-      <br>
+  const rect =
+    canvas.getBoundingClientRect();
 
-      <span style="color:${
-        state.answers[i] === "YES"
-          ? "#ff9fba"
-          : "#b7aab4"
-      }">
+  return {
 
-        ${
+    x: event.clientX - rect.left,
+
+    y: event.clientY - rect.top
+  };
+}
+
+
+/* =========================
+   START SIGNATURE
+========================= */
+
+canvas.addEventListener(
+  "pointerdown",
+  event => {
+
+    event.preventDefault();
+
+    drawing = true;
+
+    hasSignature = true;
+
+
+    /*
+      Keep receiving pointer events even if
+      the pointer moves slightly outside canvas.
+    */
+
+    try {
+
+      canvas.setPointerCapture(
+        event.pointerId
+      );
+
+    } catch(error) {}
+
+
+    const point =
+      getPointerPosition(event);
+
+
+    /*
+      Start a fresh stroke.
+    */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      point.x,
+      point.y
+    );
+  }
+);
+
+
+/* =========================
+   DRAW SIGNATURE
+========================= */
+
+canvas.addEventListener(
+  "pointermove",
+  event => {
+
+    if(!drawing) return;
+
+    event.preventDefault();
+
+    const point =
+      getPointerPosition(event);
+
+
+    /*
+      Make absolutely sure the ink
+      remains dark.
+    */
+
+    ctx.strokeStyle = "#1b0d14";
+
+
+    ctx.lineTo(
+      point.x,
+      point.y
+    );
+
+    ctx.stroke();
+  }
+);
+
+
+/* =========================
+   STOP SIGNATURE
+========================= */
+
+function stopDrawing(event){
+
+  if(!drawing) return;
+
+  drawing = false;
+
+
+  try {
+
+    if(
+      canvas.hasPointerCapture(
+        event.pointerId
+      )
+    ){
+
+      canvas.releasePointerCapture(
+        event.pointerId
+      );
+    }
+
+  } catch(error) {}
+
+
+  ctx.closePath();
+}
+
+
+canvas.addEventListener(
+  "pointerup",
+  stopDrawing
+);
+
+canvas.addEventListener(
+  "pointercancel",
+  stopDrawing
+);
+
+
+/*
+  Extra safety:
+  If the mouse leaves the browser while drawing,
+  stop the stroke cleanly.
+*/
+
+window.addEventListener(
+  "pointerup",
+  event => {
+
+    if(drawing){
+
+      stopDrawing(event);
+    }
+  }
+);
+
+
+/* =========================
+   CLEAR SIGNATURE
+========================= */
+
+$("clearSignature").addEventListener(
+  "click",
+  () => {
+
+    /*
+      Reset the canvas completely.
+
+      This is safer than clearing only the
+      CSS-sized area because the actual canvas
+      may have a higher DPR resolution.
+    */
+
+    ctx.setTransform(
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+    );
+
+    ctx.clearRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+
+    /*
+      Rebuild the drawing configuration.
+    */
+
+    setupCanvas();
+
+
+    drawing = false;
+
+    hasSignature = false;
+
+    state.signature = "";
+  }
+);
+
+
+/* =========================
+   FINISH / SAVE SIGNATURE
+========================= */
+
+$("finish").addEventListener(
+  "click",
+  async () => {
+
+    if(!hasSignature){
+
+      alert(
+        "Shylaaa, you need to sign first ❤️"
+      );
+
+      return;
+    }
+
+
+    /*
+      Convert the completed canvas
+      into an image for the final letter
+      and Telegram submission.
+    */
+
+    state.signature =
+      canvas.toDataURL("image/png");
+
+
+    $("savedSignature").src =
+      state.signature;
+
+
+    renderFinalLetter();
+
+
+    show("finale");
+
+
+    setTimeout(() => {
+
+      $("handwritten")
+        .classList
+        .add("show");
+
+    }, 150);
+
+
+    await sendToTelegram();
+  }
+);
+
+
+/* =========================================================
+   FINAL LETTER
+========================================================= */
+
+function renderFinalLetter(){
+
+  const accepted =
+    questions.map((q, i) => `
+
+      <p>
+
+        <strong>
+          ${i + 1}. ${escapeHtml(q.text)}
+        </strong>
+
+        <br>
+
+        <span style="color:${
           state.answers[i] === "YES"
-            ? "YES — accepted ❤️"
-            : "NO — not yet"
-        }
+            ? "#ff9fba"
+            : "#b7aab4"
+        }">
 
-      </span>
-    </p>
-  `).join("");
+          ${
+            state.answers[i] === "YES"
+              ? "YES — accepted ❤️"
+              : "NO — not yet"
+          }
+
+        </span>
+
+      </p>
+
+    `).join("");
+
 
   $("finalLetter").innerHTML = `
-    <p><strong>My Shylaaa,</strong></p>
+
+    <p>
+      <strong>My Shylaaa,</strong>
+    </p>
 
     <p>
       We found each other.
@@ -422,7 +765,9 @@ function renderFinalLetter() {
       we cannot take back.
     </p>
 
-    <p><strong>Our commitments:</strong></p>
+    <p>
+      <strong>Our commitments:</strong>
+    </p>
 
     ${accepted}
 
@@ -437,44 +782,63 @@ function renderFinalLetter() {
       the hard conversations, the laughter, the prayers,
       the adventures, and every chapter still ahead.
     </p>
+
   `;
 }
 
 
-/* =========================
+/* =========================================================
    TELEGRAM SUBMISSION
-========================= */
+========================================================= */
 
-async function sendToTelegram() {
+async function sendToTelegram(){
 
   try {
 
     const payload = {
-      timestamp: new Date().toISOString(),
 
-      answers: questions.map((q, i) => ({
-        question: q.text,
-        answer: state.answers[i]
-      })),
+      timestamp:
+        new Date().toISOString(),
 
-      signature: state.signature
+      answers:
+        questions.map((q, i) => ({
+
+          question: q.text,
+
+          answer:
+            state.answers[i]
+
+        })),
+
+      signature:
+        state.signature
     };
 
-    const response = await fetch("/api/submit", {
-      method: "POST",
 
-      headers: {
-        "Content-Type": "application/json"
-      },
+    const response =
+      await fetch("/api/submit", {
 
-      body: JSON.stringify(payload)
-    });
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(payload)
+      });
+
 
     if(!response.ok){
-      console.warn("Telegram submission failed.");
+
+      console.warn(
+        "Telegram submission failed."
+      );
     }
 
   } catch(err) {
+
     console.warn(
       "Telegram submission error:",
       err
